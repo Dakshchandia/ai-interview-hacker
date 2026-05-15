@@ -8,7 +8,7 @@ Evaluates communication, cultural fit, and leadership qualities.
 import json
 import re
 from pydantic import BaseModel
-from backend.core.gemini_client import generate_response
+from core.gemini_client import generate_response
 
 
 class HRQuestion(BaseModel):

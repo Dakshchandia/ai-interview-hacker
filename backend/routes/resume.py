@@ -3,9 +3,9 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-from backend.parsers.resume_parser import resume_parser
-from backend.agents.resume_analyzer import resume_analyzer_agent, ResumeAnalysis
-from backend.core.config import settings
+from parsers.resume_parser import resume_parser
+from agents.resume_analyzer import resume_analyzer_agent, ResumeAnalysis
+from core.config import settings
 
 router = APIRouter(prefix="/resume", tags=["Resume"])
 

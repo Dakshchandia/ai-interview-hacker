@@ -10,10 +10,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-from backend.agents.technical_interviewer import technical_interviewer_agent
-from backend.agents.hr_interviewer import hr_interviewer_agent
-from backend.agents.evaluator import evaluator_agent
-from backend.routes.resume import resume_store
+from agents.technical_interviewer import technical_interviewer_agent
+from agents.hr_interviewer import hr_interviewer_agent
+from agents.evaluator import evaluator_agent
+from routes.resume import resume_store
 
 router = APIRouter(prefix="/interview", tags=["Interview"])
 

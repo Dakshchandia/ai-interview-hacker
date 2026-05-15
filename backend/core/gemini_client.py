@@ -3,7 +3,7 @@ Gemini Client — uses the new google-genai SDK (v2+)
 """
 from google import genai
 from google.genai import types
-from backend.core.config import settings
+from core.config import settings
 
 
 def get_client() -> genai.Client:

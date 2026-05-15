@@ -8,7 +8,7 @@ a comprehensive final evaluation with actionable feedback.
 import json
 import re
 from pydantic import BaseModel
-from backend.core.gemini_client import generate_response
+from core.gemini_client import generate_response
 
 
 class FinalEvaluation(BaseModel):

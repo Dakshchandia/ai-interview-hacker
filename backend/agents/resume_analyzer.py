@@ -8,7 +8,7 @@ Includes a validation layer to reject non-resume documents.
 import json
 import re
 from pydantic import BaseModel
-from backend.core.gemini_client import generate_response
+from core.gemini_client import generate_response
 
 # ------------------------------------------------------------------
 # Output schema — defines exactly what the agent returns

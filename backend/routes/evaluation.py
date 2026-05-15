@@ -6,8 +6,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-from backend.agents.roadmap_generator import roadmap_generator_agent
-from backend.routes.resume import resume_store
+from agents.roadmap_generator import roadmap_generator_agent
+from routes.resume import resume_store
 
 router = APIRouter(prefix="/roadmap", tags=["Roadmap"])
 

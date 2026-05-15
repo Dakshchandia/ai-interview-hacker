@@ -8,7 +8,7 @@ resume analysis results and interview performance.
 import json
 import re
 from pydantic import BaseModel
-from backend.core.gemini_client import generate_response
+from core.gemini_client import generate_response
 
 
 class RoadmapDay(BaseModel):

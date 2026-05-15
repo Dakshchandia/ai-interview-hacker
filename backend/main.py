@@ -10,10 +10,10 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from backend.core.config import settings
-from backend.routes.resume import router as resume_router
-from backend.routes.interview import router as interview_router
-from backend.routes.evaluation import router as evaluation_router
+from core.config import settings
+from routes.resume import router as resume_router
+from routes.interview import router as interview_router
+from routes.evaluation import router as evaluation_router
 
 # ─── App Initialization ───────────────────────────────────────────────────────
 
@@ -35,7 +35,10 @@ app.add_middleware(
         "http://localhost:3000", 
         "http://localhost:3001", 
         "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001"
+        "http://127.0.0.1:3001",
+        "https://ai-interview-hacker.vercel.app",
+        # Allow all Vercel preview URLs
+        "https://*.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -95,10 +98,8 @@ async def health():
 
 if __name__ == "__main__":
     import uvicorn
-    # We use the string "backend.main:app" so the --reload flag 
-    # works correctly with your project structure.
     uvicorn.run(
-        "backend.main:app",
+        "main:app",
         host=getattr(settings, "APP_HOST", "0.0.0.0"),
         port=getattr(settings, "APP_PORT", 8000),
         reload=True,

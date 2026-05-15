@@ -10,7 +10,7 @@ import re
 from typing import Optional
 from pydantic import BaseModel
 
-from backend.core.gemini_client import generate_response
+from core.gemini_client import generate_response
 
 
 # ─── Output schemas ───────────────────────────────────────────────────────────
