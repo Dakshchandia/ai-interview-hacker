@@ -480,7 +480,9 @@ export default function InterviewPage() {
               messages={messages}
               onSend={handleSend}
               isLoading={isLoading}
-              disabled={phase === "ended"}
+              // disabled={phase === "ended"}
+              // Is line ko aise badlein:
+              disabled={(phase as any) === "ended"}
             />
           </div>
         </div>
