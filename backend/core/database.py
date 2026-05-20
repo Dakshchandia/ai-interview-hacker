@@ -37,7 +37,12 @@ async def connect_db() -> None:
         print("⚠️  MONGODB_URL not set — running without database (in-memory only)")
         return
     try:
-        _client = AsyncIOMotorClient(MONGODB_URL, serverSelectionTimeoutMS=5000)
+        _client = AsyncIOMotorClient(
+            MONGODB_URL,
+            serverSelectionTimeoutMS=10000,
+            tls=True,
+            tlsAllowInvalidCertificates=False,
+        )
         _db = _client[DB_NAME]
         # Verify connection
         await _client.admin.command("ping")
