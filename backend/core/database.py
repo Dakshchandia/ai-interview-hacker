@@ -36,15 +36,20 @@ async def connect_db() -> None:
     if not MONGODB_URL:
         print("⚠️  MONGODB_URL not set — running without database (in-memory only)")
         return
-    _client = AsyncIOMotorClient(MONGODB_URL, serverSelectionTimeoutMS=5000)
-    _db = _client[DB_NAME]
-    # Verify connection
-    await _client.admin.command("ping")
-    print(f"✅ MongoDB connected → {DB_NAME}")
+    try:
+        _client = AsyncIOMotorClient(MONGODB_URL, serverSelectionTimeoutMS=5000)
+        _db = _client[DB_NAME]
+        # Verify connection
+        await _client.admin.command("ping")
+        print(f"✅ MongoDB connected → {DB_NAME}")
 
-    # Create indexes for fast per-user queries
-    await _db.interview_sessions.create_index([("user_id", 1), ("created_at", -1)])
-    await _db.user_stats.create_index([("user_id", 1)], unique=True)
+        # Create indexes for fast per-user queries
+        await _db.interview_sessions.create_index([("user_id", 1), ("created_at", -1)])
+        await _db.user_stats.create_index([("user_id", 1)], unique=True)
+    except Exception as e:
+        print(f"⚠️  MongoDB connection failed: {e} — running without database")
+        _client = None
+        _db = None
 
 
 async def close_db() -> None:
