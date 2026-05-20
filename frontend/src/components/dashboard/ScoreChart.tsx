@@ -1,21 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, Area, AreaChart
+  AreaChart, Area, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer,
 } from "recharts";
 import { motion } from "framer-motion";
+import { usersApi, ScoreChartPoint } from "@/lib/api";
 
-const data = [
-  { week: "W1", technical: 45, hr: 52, overall: 48 },
-  { week: "W2", technical: 52, hr: 58, overall: 55 },
-  { week: "W3", technical: 61, hr: 63, overall: 62 },
-  { week: "W4", technical: 58, hr: 70, overall: 64 },
-  { week: "W5", technical: 72, hr: 74, overall: 73 },
-  { week: "W6", technical: 78, hr: 76, overall: 77 },
-  { week: "W7", technical: 82, hr: 80, overall: 81 },
-  { week: "W8", technical: 88, hr: 85, overall: 87 },
-];
+interface ScoreChartProps {
+  userId?: string | null;
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
@@ -33,7 +28,31 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   );
 };
 
-export function ScoreChart() {
+// Empty state placeholder data (all zeros, shown when no interviews yet)
+const EMPTY_DATA = Array.from({ length: 5 }, (_, i) => ({
+  label: `#${i + 1}`,
+  technical: 0,
+  hr: 0,
+  overall: 0,
+}));
+
+export function ScoreChart({ userId }: ScoreChartProps) {
+  const [data, setData] = useState<ScoreChartPoint[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!userId) return;
+    setIsLoading(true);
+    usersApi
+      .getScoreChart(userId, 10)
+      .then((res) => setData(res.data.data))
+      .catch(() => setData([]))
+      .finally(() => setIsLoading(false));
+  }, [userId]);
+
+  const chartData = data.length > 0 ? data : EMPTY_DATA;
+  const isEmpty = data.length === 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -44,12 +63,14 @@ export function ScoreChart() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="font-heading font-semibold text-white">Score Progression</h3>
-          <p className="text-white/40 text-sm mt-0.5">8-week performance trend</p>
+          <p className="text-white/40 text-sm mt-0.5">
+            {isEmpty ? "Complete interviews to see your progress" : `Last ${data.length} interview${data.length > 1 ? "s" : ""}`}
+          </p>
         </div>
         <div className="flex items-center gap-4 text-xs">
           {[
             { label: "Technical", color: "#8b5cf6" },
-            { label: "HR", color: "#06b6d4" },
+            { label: "Communication", color: "#06b6d4" },
             { label: "Overall", color: "#10b981" },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-1.5">
@@ -60,31 +81,46 @@ export function ScoreChart() {
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={220}>
-        <AreaChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-          <defs>
-            <linearGradient id="techGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
-              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="hrGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.15} />
-              <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="overallGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
-              <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-          <XAxis dataKey="week" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }} axisLine={false} tickLine={false} domain={[30, 100]} />
-          <Tooltip content={<CustomTooltip />} />
-          <Area type="monotone" dataKey="technical" stroke="#8b5cf6" strokeWidth={2} fill="url(#techGrad)" dot={false} activeDot={{ r: 4, fill: "#8b5cf6" }} />
-          <Area type="monotone" dataKey="hr" stroke="#06b6d4" strokeWidth={2} fill="url(#hrGrad)" dot={false} activeDot={{ r: 4, fill: "#06b6d4" }} />
-          <Area type="monotone" dataKey="overall" stroke="#10b981" strokeWidth={2} fill="url(#overallGrad)" dot={false} activeDot={{ r: 4, fill: "#10b981" }} />
-        </AreaChart>
-      </ResponsiveContainer>
+      {isLoading ? (
+        <div className="h-[220px] flex items-center justify-center">
+          <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="relative">
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart data={chartData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
+              <defs>
+                <linearGradient id="techGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="hrGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="overallGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
+              <XAxis dataKey="label" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 11 }} axisLine={false} tickLine={false} domain={[0, 100]} />
+              <Tooltip content={<CustomTooltip />} />
+              <Area type="monotone" dataKey="technical" stroke="#8b5cf6" strokeWidth={2} fill="url(#techGrad)" dot={false} activeDot={{ r: 4, fill: "#8b5cf6" }} />
+              <Area type="monotone" dataKey="hr" stroke="#06b6d4" strokeWidth={2} fill="url(#hrGrad)" dot={false} activeDot={{ r: 4, fill: "#06b6d4" }} />
+              <Area type="monotone" dataKey="overall" stroke="#10b981" strokeWidth={2} fill="url(#overallGrad)" dot={false} activeDot={{ r: 4, fill: "#10b981" }} />
+            </AreaChart>
+          </ResponsiveContainer>
+
+          {/* Empty state overlay */}
+          {isEmpty && (
+            <div className="absolute inset-0 flex items-center justify-center bg-[#050810]/60 rounded-xl">
+              <p className="text-white/30 text-sm">No interview data yet</p>
+            </div>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 }

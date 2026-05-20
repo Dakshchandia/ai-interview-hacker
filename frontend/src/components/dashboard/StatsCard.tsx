@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
 
@@ -10,7 +10,7 @@ interface StatsCardProps {
   value: number;
   suffix?: string;
   prefix?: string;
-  change: number;       // e.g. +12 or -5
+  change?: number;       // e.g. +12 or -5 (optional — hidden when 0)
   changeLabel?: string;
   icon: LucideIcon;
   iconColor: string;
@@ -20,7 +20,7 @@ interface StatsCardProps {
 
 export function StatsCard({
   title, value, suffix = "", prefix = "",
-  change, changeLabel = "vs last week",
+  change = 0, changeLabel = "vs last week",
   icon: Icon, iconColor, iconBg, delay = 0,
 }: StatsCardProps) {
   const positive = change >= 0;
@@ -36,13 +36,6 @@ export function StatsCard({
       <div className="flex items-start justify-between mb-4">
         <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center", iconBg)}>
           <Icon className={cn("w-5 h-5", iconColor)} />
-        </div>
-        <div className={cn(
-          "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg",
-          positive ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
-        )}>
-          {positive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-          {positive ? "+" : ""}{change}%
         </div>
       </div>
 
